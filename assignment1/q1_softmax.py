@@ -28,15 +28,21 @@ def softmax(x):
     """
     orig_shape = x.shape
 
-    if len(x.shape) > 1:
+    #if len(x.shape) > 1:
         # Matrix
-        ### YOUR CODE HERE
-        raise NotImplementedError
-        ### END YOUR CODE
+        # impose numeric stability
+    if x.ndim == 1:
+        x -= np.max(x)  # solving overflow problem
+        x = np.exp(x)
+        x /= np.sum(x)
     else:
+        x -= np.max(x, axis=1, keepdims=True)  # solving overflow problem
+        x = np.exp(x)
+        x /= np.sum(x, axis=1, keepdims=True)
+    #else:
         # Vector
         ### YOUR CODE HERE
-        raise NotImplementedError
+        #raise NotImplementedError
         ### END YOUR CODE
 
     assert x.shape == orig_shape
@@ -65,7 +71,6 @@ def test_softmax_basic():
     print test3
     ans3 = np.array([0.73105858, 0.26894142])
     assert np.allclose(test3, ans3, rtol=1e-05, atol=1e-06)
-
     print "You should be able to verify these results by hand!\n"
 
 

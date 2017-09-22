@@ -102,7 +102,33 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
     indices.extend(getNegativeSamples(target, dataset, K))
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+    gradPred = np.zeros_like(predicted)
+    grad = np.zeros_like(outputVectors)
+
+    indices = [target]
+    for k in xrange(K):
+        newidx = dataset.sampleTokenIdx()
+        while newidx == target:
+            newidx = dataset.sampleTokenIdx()
+        indices += [newidx]
+
+    directions = np.array([1] + [-1 for k in xrange(K)])
+
+    V = np.shape(outputVectors)[0]
+    N = np.shape(outputVectors)[1]
+
+    outputWords = outputVectors[indices,:]
+
+    delta = sigmoid(np.dot(outputWords,predicted) * directions)
+    deltaMinus = (delta - 1) * directions;
+    cost = -np.sum(np.log(delta));
+
+    gradPred = np.dot(deltaMinus.reshape(1,K+1),outputWords).flatten()
+    gradMin = np.dot(deltaMinus.reshape(K+1,1),predicted.reshape(1,N))
+
+    for k in xrange(K+1):
+        grad[indices[k]] += gradMin[k,:]
+
     ### END YOUR CODE
 
     return cost, gradPred, grad
@@ -165,7 +191,7 @@ def cbow(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     gradOut = np.zeros(outputVectors.shape)
 
     ### YOUR CODE HERE
-    raise NotImplementedError
+    #raise NotImplementedError
     ### END YOUR CODE
 
     return cost, gradIn, gradOut
